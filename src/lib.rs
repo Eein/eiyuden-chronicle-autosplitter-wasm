@@ -1,6 +1,6 @@
 #![feature(type_alias_impl_trait, const_async_blocks)]
 
-use asr::{ timer::{self, TimerState}, future::next_tick, settings::Gui, Process, Address, PointerSize, game_engine::unity::il2cpp};
+use asr::{ timer, future::next_tick, settings::Gui, Process, PointerSize, game_engine::unity::il2cpp};
 use asr::game_engine::unity::il2cpp::Version;
 
 
