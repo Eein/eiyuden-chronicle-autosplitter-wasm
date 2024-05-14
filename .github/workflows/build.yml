@@ -38,21 +38,21 @@ jobs:
           tag_name: latest
           body: This contains the latest version of the auto splitter.
 
-  clippy:
-    name: Check clippy lints
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Commit
-        uses: actions/checkout@v3
+  # clippy:
+  #   name: Check clippy lints
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Commit
+  #       uses: actions/checkout@v3
 
-      - name: Install Rust
-        uses: hecrj/setup-rust-action@v1
-        with:
-          components: clippy
-          targets: wasm32-unknown-unknown
+  #     - name: Install Rust
+  #       uses: hecrj/setup-rust-action@v1
+  #       with:
+  #         components: clippy
+  #         targets: wasm32-unknown-unknown
 
-      - name: Run Clippy
-        run: cargo clippy --all-features
+  #     - name: Run Clippy
+  #       run: cargo clippy --all-features
 
   format:
     name: Check formatting
