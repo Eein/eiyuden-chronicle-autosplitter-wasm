@@ -1,9 +1,10 @@
 #![feature(type_alias_impl_trait, const_async_blocks)]
+#![no_std]
 
 use asr::{ timer::{self, TimerState}, future::next_tick, settings::Gui, Process, PointerSize, game_engine::unity::il2cpp};
 use asr::game_engine::unity::il2cpp::Version;
 
-
+asr::panic_handler!();
 asr::async_main!(nightly);
 
 #[derive(Gui)]
@@ -27,16 +28,7 @@ async fn main() {
         let game_manager_class = image.wait_get_class(&process, &module, "GameManager").await;
         let game_manager_parent = game_manager_class.wait_get_parent(&process, &module).await;
         let instance = game_manager_parent.wait_get_static_instance(&process, &module, "instance").await;
-
-        asr::print_message(&instance.to_string());
         let ui_manager_offset = game_manager_class.wait_get_field_offset(&process, &module, "<UIManager>k__BackingField").await;
-        
-        asr::print_message(&format!("{:x}", &ui_manager_offset));
-
-        // let (main_module_base, _main_module_size) = process
-        //     .wait_module_range("EiyudenChronicle.exe")
-        // .await;
-        //
        
         process
             .until_closes(async {
