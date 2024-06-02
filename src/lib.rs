@@ -1,19 +1,17 @@
 #![feature(type_alias_impl_trait, const_async_blocks)]
 #![no_std]
 
+use asr::{ timer::{self, TimerState}, future::next_tick, settings::Gui, Process, PointerSize, game_engine::unity::il2cpp};
 use asr::game_engine::unity::il2cpp::Version;
-use asr::{
-    future::next_tick, game_engine::unity::il2cpp, settings::Gui, timer, PointerSize, Process,
-};
 
 asr::panic_handler!();
 asr::async_main!(nightly);
 
 #[derive(Gui)]
 struct Settings {
-    /// Load Removal
+    /// My Setting
     #[default = true]
-    load_removal: bool,
+    my_setting: bool,
     // TODO: Change these settings.
 }
 
@@ -21,19 +19,17 @@ async fn main() {
     // TODO: Set up some general state and settings.
     let mut settings = Settings::register();
 
+    asr::print_message("Hello, World!");
+
     loop {
         let process = Process::wait_attach("EiyudenChronicle.exe").await;
         let module = il2cpp::Module::wait_attach(&process, Version::V2020).await;
         let image = module.wait_get_default_image(&process).await;
         let game_manager_class = image.wait_get_class(&process, &module, "GameManager").await;
         let game_manager_parent = game_manager_class.wait_get_parent(&process, &module).await;
-        let instance = game_manager_parent
-            .wait_get_static_instance(&process, &module, "instance")
-            .await;
-        let ui_manager_offset = game_manager_class
-            .wait_get_field_offset(&process, &module, "<UIManager>k__BackingField")
-            .await;
-
+        let instance = game_manager_parent.wait_get_static_instance(&process, &module, "instance").await;
+        let ui_manager_offset = game_manager_class.wait_get_field_offset(&process, &module, "<UIManager>k__BackingField").await;
+       
         process
             .until_closes(async {
                 // TODO: Load some initial information from the process.
@@ -48,12 +44,18 @@ async fn main() {
                         Err(_e) => Some(false),
                     };
 
-                    if let Some(true) = loading_value {
-                        timer::pause_game_time()
-                    } else {
-                        timer::resume_game_time()
+                    match timer::state() {
+                        TimerState::Running => {
+                            if let Some(true) = loading_value {
+                                timer::pause_game_time()
+                            } else {
+                                timer::resume_game_time()
+                            }
+                        },
+                        _ => ()
                     }
 
+                    // TODO: Do something on every tick.
                     next_tick().await;
                 }
             })
