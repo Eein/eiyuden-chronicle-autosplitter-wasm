@@ -1,70 +1,36 @@
-name: Build
+name: Release
 
 on:
-  pull_request:
+  workflow_dispatch:
   push:
     branches:
-      - 'master'
-    tags:
-      - '*'
+      - master
 
 jobs:
   build:
-    name: Build
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       contents: write
     steps:
       - name: Checkout Commit
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Install Rust
         uses: hecrj/setup-rust-action@v1
         with:
-          components: rust-src
-          rust-version: nightly
-          targets: wasm32-unknown-unknown
-
-      - name: Build
-        run: |
-          cargo b --release --locked
+          rust-version: 'nightly' 
+          targets: 'wasm32-unknown-unknown'
+          
+      - name: Build Regular Shared Library
+        run: cargo build --target wasm32-unknown-unknown --release 
 
       - name: Release
-        if: github.ref == 'refs/heads/master'
         uses: softprops/action-gh-release@v1
         with:
-          files: target/wasm32-unknown-unknown/release/eiyuden_chronicle_autosplitter_wasm.wasm
-          name: Latest
-          tag_name: latest
-          body: This contains the latest version of the auto splitter.
-
-  # clippy:
-  #   name: Check clippy lints
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout Commit
-  #       uses: actions/checkout@v3
-
-  #     - name: Install Rust
-  #       uses: hecrj/setup-rust-action@v1
-  #       with:
-  #         components: clippy
-  #         targets: wasm32-unknown-unknown
-
-  #     - name: Run Clippy
-  #       run: cargo clippy --all-features
-
-  format:
-    name: Check formatting
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Commit
-        uses: actions/checkout@v3
-
-      - name: Install Rust
-        uses: hecrj/setup-rust-action@v1
-        with:
-          components: rustfmt
-
-      - name: Run cargo fmt
-        run: cargo fmt -- --check || true
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          tag_name: release-${{ github.sha }}
+          release_name: Release ${{ github.sha }}
+          files: |
+            ./target/wasm32-unknown-unknown/release/eiyuden-chronicle-autosplitter.wasm
