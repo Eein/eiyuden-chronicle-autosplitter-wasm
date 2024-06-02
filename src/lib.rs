@@ -9,10 +9,9 @@ asr::async_main!(nightly);
 
 #[derive(Gui)]
 struct Settings {
-    /// My Setting
+    /// Enable Load Remover
     #[default = true]
-    my_setting: bool,
-    // TODO: Change these settings.
+    load_remover: bool,
 }
 
 async fn main() {
@@ -32,7 +31,6 @@ async fn main() {
        
         process
             .until_closes(async {
-                // TODO: Load some initial information from the process.
                 loop {
                     settings.update();
                     let loading_value = match process.read_pointer_path::<bool>(
@@ -44,18 +42,18 @@ async fn main() {
                         Err(_e) => Some(false),
                     };
 
-                    match timer::state() {
-                        TimerState::Running => {
-                            if let Some(true) = loading_value {
-                                timer::pause_game_time()
-                            } else {
-                                timer::resume_game_time()
-                            }
-                        },
-                        _ => ()
+                    if settings.load_remover {
+                        match timer::state() {
+                            TimerState::Running => {
+                                if let Some(true) = loading_value {
+                                    timer::pause_game_time()
+                                } else {
+                                    timer::resume_game_time()
+                                }
+                            },
+                            _ => ()
+                        }
                     }
-
-                    // TODO: Do something on every tick.
                     next_tick().await;
                 }
             })
