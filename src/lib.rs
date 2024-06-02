@@ -15,10 +15,7 @@ struct Settings {
 }
 
 async fn main() {
-    // TODO: Set up some general state and settings.
     let mut settings = Settings::register();
-
-    asr::print_message("Hello, World!");
 
     loop {
         let process = Process::wait_attach("EiyudenChronicle.exe").await;
