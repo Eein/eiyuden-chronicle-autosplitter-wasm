@@ -1,8 +1,10 @@
 #![feature(type_alias_impl_trait, const_async_blocks)]
 #![no_std]
 
-use asr::{ timer::self, future::next_tick, settings::Gui, Process, PointerSize, game_engine::unity::il2cpp};
 use asr::game_engine::unity::il2cpp::Version;
+use asr::{
+    future::next_tick, game_engine::unity::il2cpp, settings::Gui, timer, PointerSize, Process,
+};
 
 asr::panic_handler!();
 asr::async_main!(nightly);
@@ -25,9 +27,13 @@ async fn main() {
         let image = module.wait_get_default_image(&process).await;
         let game_manager_class = image.wait_get_class(&process, &module, "GameManager").await;
         let game_manager_parent = game_manager_class.wait_get_parent(&process, &module).await;
-        let instance = game_manager_parent.wait_get_static_instance(&process, &module, "instance").await;
-        let ui_manager_offset = game_manager_class.wait_get_field_offset(&process, &module, "<UIManager>k__BackingField").await;
-       
+        let instance = game_manager_parent
+            .wait_get_static_instance(&process, &module, "instance")
+            .await;
+        let ui_manager_offset = game_manager_class
+            .wait_get_field_offset(&process, &module, "<UIManager>k__BackingField")
+            .await;
+
         process
             .until_closes(async {
                 // TODO: Load some initial information from the process.
