@@ -33,4 +33,4 @@ jobs:
           tag_name: release-${{ github.sha }}
           release_name: Release ${{ github.sha }}
           files: |
-            ./target/wasm32-unknown-unknown/release/eiyuden-chronicle-autosplitter.wasm
+            ./target/wasm32-unknown-unknown/release/eiyuden_chronicle_autosplitter_wasm.wasm
